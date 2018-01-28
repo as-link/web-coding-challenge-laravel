@@ -46,5 +46,26 @@ class ShopController extends Controller
             return ShopResource::collection($shops);
         }
     }
+    /**
+     * Preffered shops api
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function getprefferedShops()
+    {
+        if(Auth::user()){
+            //Get the user
+            $user = Auth::user();
+            //Get user's liked shops
+            $shops = Shop::whereHas('opinions', function ($query) use ($user) {
+                $query->where([
+                    ['user_id', '=', $user->id],
+                    ['opinion', '=', '1']
+                ]);
+            })->paginate(10);
 
+            // Return collection of shops as a resource
+            return ShopResource::collection($shops);
+        }
+    }
 }  

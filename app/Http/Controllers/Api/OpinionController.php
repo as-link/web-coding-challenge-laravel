@@ -12,6 +12,8 @@ use App\Http\Resources\Opinion as OpinionResource;
 class OpinionController extends Controller
 {
 
+	public $unauthorised = 401;
+	
     /**
      * Store an opinion
      *
@@ -50,6 +52,38 @@ class OpinionController extends Controller
 					// Return opinion as a resource
                     return new OpinionResource($opinion);
                 }
+            }
+        }
+    }
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy($id)
+    {   
+        if(Auth::user()){
+            //Get the user
+            $user = Auth::user();
+            $opinion = Opinion::find($id);
+
+            //No opinion found for the given id
+            if(!$opinion){
+                return response()->json([
+                    'error' => 'Opinion not found!'
+                ]);
+            }
+            //Test if opinion belongs to the logged user
+            if($opinion->user_id == $user->id){
+                //Delete opinion if it belongs to logged user
+                if($opinion->delete()){
+                    return new OpinionResource($opinion);
+                }  
+            }else{
+                return response()->json([
+                    'error' => 'Unauthorized to remove this item'
+                ], $this->unauthorised);
             }
         }
     }

@@ -25,4 +25,5 @@ Route::group(['middleware' => 'auth:api'], function(){
 	Route::get('nearby-shops', 'API\ShopController@getNearbyShops');
 	Route::get('preffered-shops', 'API\ShopController@getprefferedShops');
 	Route::post('new-opinion', 'API\OpinionController@store');
+	Route::delete('remove-like-{id}', 'API\OpinionController@destroy');
 });

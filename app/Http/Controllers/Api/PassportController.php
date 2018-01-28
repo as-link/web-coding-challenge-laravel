@@ -62,6 +62,22 @@ class PassportController extends Controller
             return response()->json(['error'=>'Unauthorised'], $this->unauthorised);
         }
     }
+	
+    /**
+     * logout api
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function logout(Request $request)
+    {	
+		//clear token 
+        $value = $request->bearerToken();
+        $id = (new Parser())->parse($value)->getHeader('jti');
+        $token = $request->user()->tokens->find($id);
+        $token->revoke();
 
-
+        return response()->json([
+            'message' => 'You are Logged out.',
+        ], $this->successStatus);
+    }
 }

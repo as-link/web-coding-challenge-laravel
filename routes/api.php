@@ -24,4 +24,5 @@ Route::group(['middleware' => 'auth:api'], function(){
     Route::post('logout', 'API\PassportController@logout');
 	Route::get('nearby-shops', 'API\ShopController@getNearbyShops');
 	Route::get('preffered-shops', 'API\ShopController@getprefferedShops');
+	Route::post('new-opinion', 'API\OpinionController@store');
 });

@@ -27,4 +27,5 @@ Route::group(['middleware' => 'auth:api'], function(){
 	Route::post('new-opinion', 'API\OpinionController@store');
 	Route::delete('remove-like-{id}', 'API\OpinionController@destroy');
 	Route::post('set-location', 'API\LocationController@store');
+	Route::put('set-location', 'API\LocationController@update');
 });

@@ -14,6 +14,7 @@ use Validator;
 class LocationController extends Controller
 {
 	public $resourceCreated = 201;
+	
     /**
      * Store a newly created resource in storage.
      *
@@ -60,5 +61,44 @@ class LocationController extends Controller
             }
         }
     }
+    /**
+     * Update resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request)
+    {
+        if(Auth::user()){
+			//lat/lng validation
+            $validator = Validator::make($request->all(), [
+                'lat' => [
+                    'required',
+                    'regex:/^(\-?\d+(\.\d+)?).\s*(\-?\d+(\.\d+)?)$/'
+                    ], 
+                'lng' => [
+                    'required',
+                    'regex:/^(\-?\d+(\.\d+)?).\s*(\-?\d+(\.\d+)?)$/'
+                    ]
+            ]);
 
+			if ($validator->fails()) {
+				return response()->json(['error' => $validator->errors()]);            
+			}
+			//Get the user
+			$user = Auth::user();
+			//Set location
+			$location = $user->location;
+			$location->lat = $request->lat;
+			$location->lng = $request->lng;
+			//Update location
+			if($user->location()->save($location)){
+				return new LocationResource($location);
+			}else{
+				return response()->json([
+					'error' => 'The location could not be updated',
+				]);
+			}
+        }
+    }
 }

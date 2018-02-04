@@ -29,18 +29,32 @@ class ShopController extends Controller
             $location = User::find($user->id)->location;
             //2 hours ago
             $twoHoursAgo = date("Y-m-d H:i:s", strtotime("-2 hour"));
-            //Get shops with no opinions plus unlinked shop (unliked more than 2h ago) sorted by distance
-            $shops = Shop::select("*", DB::raw("( 3960 * Acos(Cos(Radians('$location->lat')) * Cos(Radians(lat)) * Cos(Radians(lng) - Radians('$location->lng')) + Sin(Radians('$location->lat')) * Sin(Radians(lat)))) AS distance"))
-            ->whereHas('opinions', function ($query) use ($user,$twoHoursAgo) {
-                $query->where([
-                    ['user_id', '=', $user->id],
-                    ['opinion', '=', '0'],
-                    ['opinions.created_at', '<', $twoHoursAgo]
-                ]);
-            })
-            ->orWhereDoesntHave('opinions')
-            ->orderBy('distance', 'ASC')
-            ->paginate(10);
+            if(!is_null($location)){
+                //Get shops with no opinions plus unlinked shop (unliked more than 2h ago) sorted by distance
+                $shops = Shop::select("*", DB::raw("( 3960 * Acos(Cos(Radians('$location->lat')) * Cos(Radians(lat)) * Cos(Radians(lng) - Radians('$location->lng')) + Sin(Radians('$location->lat')) * Sin(Radians(lat)))) AS distance"))
+                ->whereHas('opinions', function ($query) use ($user,$twoHoursAgo) {
+                    $query->where([
+                        ['user_id', '=', $user->id],
+                        ['opinion', '=', '0'],
+                        ['opinions.created_at', '<', $twoHoursAgo]
+                    ]);
+                })
+                ->orWhereDoesntHave('opinions')
+                ->orderBy('distance', 'ASC')
+                ->paginate(10);
+            }else{
+                //User didn't set his location yet so we get the shops without any particular sorting
+                $shops = Shop::select("*")
+                ->whereHas('opinions', function ($query) use ($user,$twoHoursAgo) {
+                    $query->where([
+                        ['user_id', '=', $user->id],
+                        ['opinion', '=', '0'],
+                        ['opinions.created_at', '<', $twoHoursAgo]
+                    ]);
+                })
+                ->orWhereDoesntHave('opinions')
+                ->paginate(10);
+            }
 
             // Return collection of shops as a resource
             return ShopResource::collection($shops);

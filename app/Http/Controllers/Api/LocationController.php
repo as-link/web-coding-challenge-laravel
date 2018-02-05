@@ -14,7 +14,30 @@ use Validator;
 class LocationController extends Controller
 {
 	public $resourceCreated = 201;
-	
+    
+    /**
+     * get location
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function getLocation()
+    {
+        if(Auth::user()){
+            //Get the user
+            $user = Auth::user();
+            //Get user lat lng
+            $location = Location::where('user_id','=', $user->id)->get();
+            //if the user didn't set his location yet
+            if(!$location->count()){
+                //return empty location
+                $location = ['lat'=> '', 'lng' => ''];
+                return response()->json(['data'=> $location]);
+            }else{
+                // Return collection of location as a resource
+                return new LocationResource($location->first());
+            }
+        }
+    }
     /**
      * Store a newly created resource in storage.
      *

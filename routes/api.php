@@ -28,4 +28,5 @@ Route::group(['middleware' => ['auth:api','cors']], function(){
 	Route::delete('remove-like-{id}', 'API\OpinionController@destroy');
 	Route::post('set-location', 'API\LocationController@store');
 	Route::put('set-location', 'API\LocationController@update');
+	Route::get('get-location', 'API\LocationController@getLocation');
 });

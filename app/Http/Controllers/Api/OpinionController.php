@@ -87,4 +87,36 @@ class OpinionController extends Controller
             }
         }
     }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function removeOpinion($shop_id)
+    {   
+        if(Auth::user()){
+            //Get the user
+            $user = Auth::user();
+            $opinion = Opinion::where([
+                ['shop_id', '=', $shop_id],
+                ['user_id', '=', $user->id],
+                ['opinion', '=', 1]
+            ]);
+            //No opinion found for the given id
+            if(count($opinion->get()) == 0){
+                return response()->json([
+                    'error' => 'Opinion not found!'
+                ]);
+            }else{
+                //Delete opinion
+                if($opinion->delete()){
+                    return response()->json([
+                        'success' => 'The shop has been removed from the preffered shop list'
+                    ]);
+                }  
+            }
+        }
+    }
 }

@@ -25,8 +25,10 @@ Route::group(['middleware' => ['auth:api','cors']], function(){
 	Route::get('nearby-shops', 'API\ShopController@getNearbyShops');
 	Route::get('preffered-shops', 'API\ShopController@getprefferedShops');
 	Route::post('new-opinion', 'API\OpinionController@store');
-	Route::delete('remove-like-{id}', 'API\OpinionController@destroy');
+	//Route::delete('remove-like-{id}', 'API\OpinionController@destroy');
 	Route::post('set-location', 'API\LocationController@store');
 	Route::put('set-location', 'API\LocationController@update');
 	Route::get('get-location', 'API\LocationController@getLocation');
+	Route::delete('remove-like-{shop_id}', 'API\OpinionController@removeOpinion');
+	
 });

@@ -12,7 +12,11 @@ use App\Http\Resources\Opinion as OpinionResource;
 class OpinionController extends Controller
 {
 
-	public $unauthorised = 401;
+    public $unauthorised = 401;
+    public $successStatus = 200;
+    public $notFound = 404;
+    public $successCreated = 201;
+    public $successDeleted = 204;
 	
     /**
      * Store an opinion
@@ -37,8 +41,9 @@ class OpinionController extends Controller
                     if(Opinion::where('id', $opinion->id)->update([
                         'created_at' => date("Y-m-d H:i:s")
                         ])){
-							// Return opinion as a resource
-                            return new OpinionResource($opinion);   
+                            return response()->json([
+                                'success' => 'The shop has been disliked and wont show up in the list for the next 2 hours',
+                            ], $this->successStatus);
                         }
                 }
             }else{ 
@@ -49,10 +54,20 @@ class OpinionController extends Controller
                 $opinion->opinion = $request->opinion;
 
                 if($opinion->save()){
-					// Return opinion as a resource
-                    return new OpinionResource($opinion);
+                    if($request->opinion == 0){
+                        return response()->json([
+                            'success' => 'The shop has been disliked and wont show up in the list for the next 2 hours',
+                        ], $this->successCreated);
+                    }else if($request->opinion == 1){
+                        return response()->json([
+                            'success' => 'The shop has been liked. You can find it the in preferred shop list',
+                        ], $this->successCreated);
+                    }
                 }
             }
+        }else{
+            // Unauthenticated
+            return response()->json(['error'=>'You need to login to perform this action'], $this->unauthorised);
         }
     }
     /**
@@ -108,15 +123,18 @@ class OpinionController extends Controller
             if(count($opinion->get()) == 0){
                 return response()->json([
                     'error' => 'Opinion not found!'
-                ]);
+                ], $this->notFound);
             }else{
                 //Delete opinion
                 if($opinion->delete()){
                     return response()->json([
                         'success' => 'The shop has been removed from the preffered shop list'
-                    ]);
+                    ], $this->successStatus);
                 }  
             }
+        }else{
+            // Unauthenticated
+            return response()->json(['error'=>'You need to login to perform this action'], $this->unauthorised);
         }
     }
 }

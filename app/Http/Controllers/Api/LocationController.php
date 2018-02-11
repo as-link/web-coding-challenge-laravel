@@ -13,8 +13,10 @@ use Validator;
 
 class LocationController extends Controller
 {
-	public $resourceCreated = 201;
-    
+	public $successCreated = 201;
+    public $unauthorised = 401;
+    public $successStatus = 200;
+    public $badRequest = 400;
     /**
      * get location
      *
@@ -31,11 +33,14 @@ class LocationController extends Controller
             if(!$location->count()){
                 //return empty location
                 $location = ['lat'=> '', 'lng' => ''];
-                return response()->json(['data'=> $location]);
+                return response()->json(['data'=> $location], $this->successStatus);
             }else{
                 // Return collection of location as a resource
                 return new LocationResource($location->first());
             }
+        }else{
+            // Unauthenticated
+            return response()->json(['error'=>'You need to login to perform this action'], $this->unauthorised);
         }
     }
     /**
@@ -62,7 +67,7 @@ class LocationController extends Controller
                 ]);
 
             if ($validator->fails()) {
-                return response()->json(['error' => $validator->errors()]);            
+                return response()->json(['error' => $validator->errors()], $this->badRequest);            
             }
 
             //No location for the logged user
@@ -74,14 +79,18 @@ class LocationController extends Controller
                 ];
                 //save location
                 if($location = $user->location()->create($new_location)){
-					// Return a location as a resource
-                    return new LocationResource($location, $this->resourceCreated);
+                    return response()->json([
+                        'success' => 'Your location has been set successfully',
+                    ], $this->successCreated);
                 }else{
                     return response()->json([
                         'error' => 'The location could not be saved',
                     ]);
                 }
             }
+        }else{
+            // Unauthenticated
+            return response()->json(['error'=>'You need to login to perform this action'], $this->unauthorised);
         }
     }
     /**
@@ -106,7 +115,7 @@ class LocationController extends Controller
             ]);
 
 			if ($validator->fails()) {
-				return response()->json(['error' => $validator->errors()]);            
+				return response()->json(['error' => $validator->errors()], $this->badRequest);            
 			}
 			//Get the user
 			$user = Auth::user();
@@ -116,12 +125,17 @@ class LocationController extends Controller
 			$location->lng = $request->lng;
 			//Update location
 			if($user->location()->save($location)){
-				return new LocationResource($location);
+                return response()->json([
+                    'success' => 'Your location has been updated successfully',
+                ], $this->successStatus);
 			}else{
 				return response()->json([
 					'error' => 'The location could not be updated',
 				]);
 			}
+        }else{
+            // Unauthenticated
+            return response()->json(['error'=>'You need to login to perform this action'], $this->unauthorised);
         }
     }
 }

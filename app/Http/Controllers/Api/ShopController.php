@@ -13,7 +13,10 @@ use DB;
 
 class ShopController extends Controller
 {
-
+    public $successStatus = 200;
+	public $unauthorised = 401;
+    public $badRequest = 400;
+    
     /**
      * Shops api
      *
@@ -58,6 +61,9 @@ class ShopController extends Controller
 
             // Return collection of shops as a resource
             return ShopResource::collection($shops);
+        }else{
+            // Unauthenticated
+            return response()->json(['error'=>'You need to login to visit this page'], $this->unauthorised);
         }
     }
     /**
@@ -80,6 +86,9 @@ class ShopController extends Controller
 
             // Return collection of shops as a resource
             return ShopResource::collection($shops);
+        }else{
+            // Unauthenticated
+            return response()->json(['error'=>'You need to login to visit this page'], $this->unauthorised);
         }
     }
 }  

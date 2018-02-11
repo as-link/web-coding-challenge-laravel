@@ -18,6 +18,7 @@ class Shop extends Resource
             "id" => $this->id,
             "city" => $this->city,
             "email" => $this->email,
+            "description" => $this->description,
             "name" => $this->name,
             "picture" => $this->picture,
             "lat" => $this->lat,

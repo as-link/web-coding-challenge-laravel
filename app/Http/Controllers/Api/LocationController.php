@@ -67,7 +67,7 @@ class LocationController extends Controller
                 ]);
 
             if ($validator->fails()) {
-                return response()->json(['error' => $validator->errors()], $this->badRequest);            
+                return response()->json(['error' => 'The Latitude and longitude are required and should be in decimal degrees format'], $this->badRequest);            
             }
 
             //No location for the logged user

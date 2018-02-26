@@ -9,7 +9,7 @@
 **- Install the dependencies**<br />
 	`$ composer install`
 	
-**- Import the database using phpmyadmin or the following command line**<br />
+**- Import the shops.sql file using phpmyadmin or the following command line**<br />
 	`$ mysql -u username -p databasename < shops.sql`
 	
 **- If you can't see the .env file use the folowing command to create it**<br />
